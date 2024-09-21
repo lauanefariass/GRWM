@@ -10,22 +10,6 @@ const Grwm = mongoose.model("GRWM", {
   image: String,
 });
 
-app.post("/", async (req, res) => {
-  const newGRWM = new Grwm({
-    brand: req.body.brand,
-    price: req.body.price,
-    description: req.body.description,
-    image: req.body.image,
-  });
-  await newGRWM.save();
-  return res.send("Successfully created");
-});
-
-app.get("/", async (req, res) => {
-  const grwmItems = await Grwm.find();
-  return res.send(grwmItems);
-});
-
 app.use(express.json());
 
 app.listen(port, () => {
