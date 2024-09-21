@@ -41,6 +41,10 @@ app.put("/:id", async (req, res) => {
   );
   return res.send("Successfully updated");
 });
+app.delete("/:id", async (req, res) => {
+  await Grwm.findByIdAndDelete(req.params.id);
+  return res.send("Successfully deleted");
+});
 
 mongoose
   .connect("mongodb://localhost:27017/test", {})
