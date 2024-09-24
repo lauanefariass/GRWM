@@ -23,11 +23,6 @@ app.post("/", async (req, res) => {
   return res.send("Successfully created");
 });
 
-app.get("/", async (req, res) => {
-  const grwmItems = await Grwm.find();
-  return res.send(grwmItems);
-});
-
 app.put("/:id", async (req, res) => {
   const updatedGRWM = await Grwm.findByIdAndUpdate(
     req.params.id,
@@ -44,6 +39,11 @@ app.put("/:id", async (req, res) => {
 app.delete("/:id", async (req, res) => {
   await Grwm.findByIdAndDelete(req.params.id);
   return res.send("Successfully deleted");
+});
+
+app.get("/", async (req, res) => {
+  const grwmItems = await Grwm.find();
+  return res.send(grwmItems);
 });
 
 mongoose
