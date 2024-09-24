@@ -10,6 +10,7 @@ const Grwm = mongoose.model("GRWM", {
   image_url: String,
 });
 
+
 app.use(express.json());
 
 app.post("/", async (req, res) => {
@@ -36,10 +37,12 @@ app.put("/:id", async (req, res) => {
   );
   return res.send("Successfully updated");
 });
+
 app.delete("/:id", async (req, res) => {
   await Grwm.findByIdAndDelete(req.params.id);
   return res.send("Successfully deleted");
 });
+
 
 app.get("/", async (req, res) => {
   const grwmItems = await Grwm.find();
