@@ -12,35 +12,8 @@ const Grwm = mongoose.model("GRWM", {
 
 app.use(express.json());
 
-app.post("/", async (req, res) => {
-  const newGRWM = new Grwm({
-    brand: req.body.brand,
-    price: req.body.price,
-    description: req.body.description,
-    image_url: req.body.image_url,
-  });
-  await newGRWM.save();
-  return res.send("Successfully created");
-});
 
-app.get("/", async (req, res) => {
-  const grwmItems = await Grwm.find();
-  return res.send(grwmItems);
-});
 
-app.put("/:id", async (req, res) => {
-  const updatedGRWM = await Grwm.findByIdAndUpdate(
-    req.params.id,
-    {
-      brand: req.body.brand,
-      price: req.body.price,
-      description: req.body.description,
-      image: req.body.image,
-    },
-    { new: true }
-  );
-  return res.send("Successfully updated");
-});
 
 mongoose
   .connect("mongodb://localhost:27017/test", {})
