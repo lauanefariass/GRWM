@@ -24,8 +24,6 @@ app.post("/", async (req, res) => {
   return res.send("Successfully created");
 });
 
-});
-
 app.put("/:id", async (req, res) => {
   const updatedGRWM = await Grwm.findByIdAndUpdate(
     req.params.id,
@@ -45,6 +43,11 @@ app.delete("/:id", async (req, res) => {
   return res.send("Successfully deleted");
 });
 
+
+app.get("/", async (req, res) => {
+  const grwmItems = await Grwm.find();
+  return res.send(grwmItems);
+});
 
 mongoose
   .connect("mongodb://localhost:27017/test", {})
