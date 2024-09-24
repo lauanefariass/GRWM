@@ -13,16 +13,6 @@ const Grwm = mongoose.model("GRWM", {
 
 app.use(express.json());
 
-app.post("/", async (req, res) => {
-  const newGRWM = new Grwm({
-    brand: req.body.brand,
-    price: req.body.price,
-    description: req.body.description,
-    image_url: req.body.image_url,
-  });
-  await newGRWM.save();
-  return res.send("Successfully created");
-});
 
 app.listen(port, () => {
   console.log(`Server connected at port ${port}`);
