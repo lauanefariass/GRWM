@@ -15,6 +15,7 @@ const Grwm = mongoose.model("GRWM", {
   },
 });
 
+
 app.use(express.json());
 
 
@@ -80,7 +81,13 @@ app.delete("/:id", async (req, res) => {
 });
 
 
+
 app.get("/items/:id?", async (req, res) => {
+
+
+app.get("/:id", async (req, res) => {
+
+
   try {
     if (req.params.id) {
       const grwmItem = await Grwm.findById(req.params.id);
@@ -100,7 +107,11 @@ app.get("/items/:id?", async (req, res) => {
 });
 
 
+
 app.get("/filters", async (req, res) => {
+
+app.get("/brand/:name?", async (req, res) => {
+
   try {
     const filters = {};
 
@@ -123,6 +134,12 @@ app.get("/filters", async (req, res) => {
         .status(404)
         .json({ message: "No items found with the provided filters" });
     }
+
+
+
+app.get("/", async (req, res) => {
+  try {
+    const grwmItems = await Grwm.find();
 
     return res.status(200).json(grwmItems);
   } catch (error) {
