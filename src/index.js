@@ -1,9 +1,8 @@
 const express = require("express");
 const app = express();
-const port = 3000; // Porta diferente da 27017
+const port = 3000;
 const mongoose = require("mongoose");
 
-// Definição correta do modelo Grwm (removi a duplicação)
 const Grwm = mongoose.model("GRWM", {
   brand: { type: String, required: true },
   price: { type: Number, required: true },
@@ -11,7 +10,7 @@ const Grwm = mongoose.model("GRWM", {
   image_url: { type: String, required: true },
   category: {
     type: String,
-    enum: ["t-shirt", "pants", "dresses", "jackets", "accessories"], // Categorias especificadas
+    enum: ["t-shirt", "pants", "dresses", "jackets", "accessories"],
     required: true,
   },
 });
@@ -21,21 +20,18 @@ app.use(express.json());
 
 app.post("/", async (req, res) => {
   try {
-    // Verifica se o corpo da requisição contém um array de itens
     if (Array.isArray(req.body)) {
-      // Cria vários itens de uma vez
       const newGRWMItems = await Grwm.insertMany(req.body);
       return res
         .status(201)
         .json({ message: "Successfully created", data: newGRWMItems });
     } else {
-      // Cria um único item
       const newGRWM = new Grwm({
         brand: req.body.brand,
         price: req.body.price,
         description: req.body.description,
         image_url: req.body.image_url,
-        category: req.body.category, // Adicionei a categoria aqui
+        category: req.body.category,
       });
       await newGRWM.save();
       return res.status(201).send("Successfully created");
@@ -55,8 +51,8 @@ app.put("/:id", async (req, res) => {
         brand: req.body.brand,
         price: req.body.price,
         description: req.body.description,
-        image_url: req.body.image_url, // Corrigi o nome do campo de 'image' para 'image_url'
-        category: req.body.category, // Adicionei a categoria aqui
+        image_url: req.body.image_url,
+        category: req.body.category,
       },
       { new: true }
     );
@@ -72,6 +68,19 @@ app.delete("/:id", async (req, res) => {
     return res.status(200).send("Successfully deleted");
   } catch (error) {
     return res.status(500).send("Error deleting GRWM item: " + error.message);
+  }
+});
+
+
+app.get("/:id", async (req, res) => {
+  try {
+    const grwmItem = await Grwm.findById(req.params.id);
+    if (!grwmItem) {
+      return res.status(404).send("Item not found");
+    }
+    return res.status(200).json(grwmItem);
+  } catch (error) {
+    return res.status(500).send("Error retrieving GRWM item: " + error.message);
   }
 });
 
