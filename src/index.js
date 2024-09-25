@@ -1,52 +1,90 @@
 const express = require("express");
 const app = express();
-const port = 3000; // Use uma porta diferente da 27017
+const port = 3000; // Porta diferente da 27017
 const mongoose = require("mongoose");
 
+// Definição correta do modelo Grwm (removi a duplicação)
 const Grwm = mongoose.model("GRWM", {
-  brand: String,
-  price: Number,
-  description: String,
-  image_url: String,
+  brand: { type: String, required: true },
+  price: { type: Number, required: true },
+  description: { type: String, required: true },
+  image_url: { type: String, required: true },
+  category: {
+    type: String,
+    enum: ["t-shirt", "pants", "dresses", "jackets", "accessories"], // Categorias especificadas
+    required: true,
+  },
 });
 
 
 app.use(express.json());
 
 app.post("/", async (req, res) => {
-  const newGRWM = new Grwm({
-    brand: req.body.brand,
-    price: req.body.price,
-    description: req.body.description,
-    image_url: req.body.image_url,
-  });
-  await newGRWM.save();
-  return res.send("Successfully created");
+  try {
+    // Verifica se o corpo da requisição contém um array de itens
+    if (Array.isArray(req.body)) {
+      // Cria vários itens de uma vez
+      const newGRWMItems = await Grwm.insertMany(req.body);
+      return res
+        .status(201)
+        .json({ message: "Successfully created", data: newGRWMItems });
+    } else {
+      // Cria um único item
+      const newGRWM = new Grwm({
+        brand: req.body.brand,
+        price: req.body.price,
+        description: req.body.description,
+        image_url: req.body.image_url,
+        category: req.body.category, // Adicionei a categoria aqui
+      });
+      await newGRWM.save();
+      return res.status(201).send("Successfully created");
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .send("Error creating GRWM item(s): " + error.message);
+  }
 });
 
 app.put("/:id", async (req, res) => {
-  const updatedGRWM = await Grwm.findByIdAndUpdate(
-    req.params.id,
-    {
-      brand: req.body.brand,
-      price: req.body.price,
-      description: req.body.description,
-      image: req.body.image,
-    },
-    { new: true }
-  );
-  return res.send("Successfully updated");
+  try {
+    const updatedGRWM = await Grwm.findByIdAndUpdate(
+      req.params.id,
+      {
+        brand: req.body.brand,
+        price: req.body.price,
+        description: req.body.description,
+        image_url: req.body.image_url, // Corrigi o nome do campo de 'image' para 'image_url'
+        category: req.body.category, // Adicionei a categoria aqui
+      },
+      { new: true }
+    );
+    return res.status(200).send("Successfully updated");
+  } catch (error) {
+    return res.status(500).send("Error updating GRWM item: " + error.message);
+  }
 });
 
 app.delete("/:id", async (req, res) => {
-  await Grwm.findByIdAndDelete(req.params.id);
-  return res.send("Successfully deleted");
+  try {
+    await Grwm.findByIdAndDelete(req.params.id);
+    return res.status(200).send("Successfully deleted");
+  } catch (error) {
+    return res.status(500).send("Error deleting GRWM item: " + error.message);
+  }
 });
 
 
 app.get("/", async (req, res) => {
-  const grwmItems = await Grwm.find();
-  return res.send(grwmItems);
+  try {
+    const grwmItems = await Grwm.find();
+    return res.status(200).json(grwmItems);
+  } catch (error) {
+    return res
+      .status(500)
+      .send("Error retrieving GRWM items: " + error.message);
+  }
 });
 
 mongoose
