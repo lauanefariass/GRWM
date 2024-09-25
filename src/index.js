@@ -72,7 +72,9 @@ app.delete("/:id", async (req, res) => {
 });
 
 
+
 app.get("/:id", async (req, res) => {
+
   try {
     const grwmItem = await Grwm.findById(req.params.id);
     if (!grwmItem) {
@@ -81,6 +83,24 @@ app.get("/:id", async (req, res) => {
     return res.status(200).json(grwmItem);
   } catch (error) {
     return res.status(500).send("Error retrieving GRWM item: " + error.message);
+  }
+});
+
+
+app.get("/brand/:name?", async (req, res) => {
+  try {
+    const brandName = req.params.name;
+    const grwmItem = await Grwm.findOne({ brand: brandName });
+
+    if (!grwmItem) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
+    return res.status(200).json(grwmItem);
+  } catch (error) {
+    return res
+      .status(500)
+      .send("Error retrieving item by brand: " + error.message);
   }
 });
 
