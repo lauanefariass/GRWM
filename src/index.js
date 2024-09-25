@@ -15,6 +15,7 @@ const Grwm = mongoose.model("GRWM", {
   },
 });
 
+
 app.use(express.json());
 
 app.post("/", async (req, res) => {
@@ -70,6 +71,7 @@ app.delete("/:id", async (req, res) => {
   }
 });
 
+
 app.get("/:id", async (req, res) => {
   try {
     const grwmItem = await Grwm.findById(req.params.id);
@@ -81,6 +83,7 @@ app.get("/:id", async (req, res) => {
     return res.status(500).send("Error retrieving GRWM item: " + error.message);
   }
 });
+
 
 app.get("/", async (req, res) => {
   try {
