@@ -72,8 +72,6 @@ app.delete("/:id", async (req, res) => {
 });
 
 
-app.get("/:id?", async (req, res) => {
-
 
 app.get("/:id", async (req, res) => {
 
