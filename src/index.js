@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const app = express();
 const port = 3000;
 
-// Enum para categorias
+
 const Categories = {
   T_SHIRT: "t-shirt",
   PANTS: "pants",
@@ -13,7 +13,7 @@ const Categories = {
   ACCESSORIES: "accessories",
 };
 
-// Modelo GRWM
+
 const Grwm = mongoose.model("GRWM", {
   brand: { type: String, required: true },
   price: { type: Number, required: true },
@@ -28,10 +28,10 @@ const Grwm = mongoose.model("GRWM", {
 
 app.use(express.json());
 
-// Função para verificar se um ID é um ObjectId válido
+
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
-// Rota GET /
+
 app.get("/", async (req, res) => {
   try {
     const grwmItems = await Grwm.find();
@@ -41,7 +41,7 @@ app.get("/", async (req, res) => {
   }
 });
 
-// Rota POST para criar GRWM
+
 app.post("/", async (req, res) => {
   try {
     if (Array.isArray(req.body)) {
@@ -63,7 +63,7 @@ app.post("/", async (req, res) => {
   }
 });
 
-// Rota PUT para atualizar GRWM
+
 app.put("/:id", async (req, res) => {
   try {
     if (!isValidObjectId(req.params.id)) {
@@ -91,7 +91,7 @@ app.put("/:id", async (req, res) => {
   }
 });
 
-// Rota DELETE para remover GRWM
+
 app.delete("/:id", async (req, res) => {
   try {
     if (!isValidObjectId(req.params.id)) {
@@ -108,7 +108,7 @@ app.delete("/:id", async (req, res) => {
   }
 });
 
-// Rota GET para buscar um item específico pelo ID
+
 app.get("/:id", async (req, res) => {
   try {
     if (!isValidObjectId(req.params.id)) {
@@ -125,7 +125,7 @@ app.get("/:id", async (req, res) => {
   }
 });
 
-// Rota GET para buscar itens por marca
+
 app.get("/brand/:name?", async (req, res) => {
   try {
     const brandName = req.params.name;
@@ -141,7 +141,6 @@ app.get("/brand/:name?", async (req, res) => {
   }
 });
 
-// Rota GET para buscar itens por filtros
 app.get("/items/filters", async (req, res) => {
   try {
     const filters = {};
@@ -168,7 +167,6 @@ app.get("/items/filters", async (req, res) => {
   }
 });
 
-// Conexão com o MongoDB
 mongoose
   .connect("mongodb://localhost:27017/test", {})
   .then(() => {
