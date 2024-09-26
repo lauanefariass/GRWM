@@ -15,7 +15,6 @@ const Grwm = mongoose.model("GRWM", {
   },
 });
 
-
 app.use(express.json());
 
 app.post("/", async (req, res) => {
@@ -71,10 +70,7 @@ app.delete("/:id", async (req, res) => {
   }
 });
 
-
-
 app.get("/:id", async (req, res) => {
-
   try {
     const grwmItem = await Grwm.findById(req.params.id);
     if (!grwmItem) {
@@ -85,7 +81,6 @@ app.get("/:id", async (req, res) => {
     return res.status(500).send("Error retrieving GRWM item: " + error.message);
   }
 });
-
 
 app.get("/brand/:name?", async (req, res) => {
   try {
@@ -104,6 +99,38 @@ app.get("/brand/:name?", async (req, res) => {
   }
 });
 
+app.get("/items/filters", async (req, res) => {
+  try {
+    const filters = {};
+
+    if (req.query.brand) {
+      filters.brand = req.query.brand;
+    }
+    if (req.query.category) {
+      filters.category = req.query.category;
+    }
+    if (req.query.description) {
+      filters.description = { $regex: req.query.description, $options: "i" };
+    }
+
+    console.log("Filters:", filters);
+
+    const grwmItems = await Grwm.find(filters);
+
+    if (grwmItems.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No items found with the provided filters" });
+    }
+
+    return res.status(200).json(grwmItems);
+  } catch (error) {
+    console.error("Error details:", error);
+    return res
+      .status(500)
+      .send("Error retrieving items by filters: " + error.message);
+  }
+});
 
 app.get("/", async (req, res) => {
   try {
