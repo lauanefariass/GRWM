@@ -1,7 +1,18 @@
 const express = require("express");
+const mongoose = require("mongoose");
+
 const app = express();
 const port = 3000;
-const mongoose = require("mongoose");
+
+
+const Categories = {
+  T_SHIRT: "t-shirt",
+  PANTS: "pants",
+  DRESSES: "dresses",
+  JACKETS: "jackets",
+  ACCESSORIES: "accessories",
+};
+
 
 const Grwm = mongoose.model("GRWM", {
   brand: { type: String, required: true },
@@ -10,23 +21,32 @@ const Grwm = mongoose.model("GRWM", {
   image_url: { type: String, required: true },
   category: {
     type: String,
-    enum: ["t-shirt", "pants", "dresses", "jackets", "accessories"],
+    enum: Object.values(Categories),
     required: true,
   },
 });
 
 app.use(express.json());
 
-// Adiciona validação do ObjectId
+
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
+
+
+app.get("/", async (req, res) => {
+  try {
+    const grwmItems = await Grwm.find();
+    return res.status(200).json(grwmItems);
+  } catch (error) {
+    return res.status(500).send("Error retrieving GRWM items: " + error.message);
+  }
+});
+
 
 app.post("/", async (req, res) => {
   try {
     if (Array.isArray(req.body)) {
       const newGRWMItems = await Grwm.insertMany(req.body);
-      return res
-        .status(201)
-        .json({ message: "Successfully created", data: newGRWMItems });
+      return res.status(201).json({ message: "Successfully created", data: newGRWMItems });
     } else {
       const newGRWM = new Grwm({
         brand: req.body.brand,
@@ -39,11 +59,10 @@ app.post("/", async (req, res) => {
       return res.status(201).send("Successfully created");
     }
   } catch (error) {
-    return res
-      .status(500)
-      .send("Error creating GRWM item(s): " + error.message);
+    return res.status(500).send("Error creating GRWM item(s): " + error.message);
   }
 });
+
 
 app.put("/:id", async (req, res) => {
   try {
@@ -66,12 +85,12 @@ app.put("/:id", async (req, res) => {
     if (!updatedGRWM) {
       return res.status(404).send("Item not found");
     }
-
     return res.status(200).send("Successfully updated");
   } catch (error) {
     return res.status(500).send("Error updating GRWM item: " + error.message);
   }
 });
+
 
 app.delete("/:id", async (req, res) => {
   try {
@@ -80,16 +99,15 @@ app.delete("/:id", async (req, res) => {
     }
 
     const deletedGRWM = await Grwm.findByIdAndDelete(req.params.id);
-
     if (!deletedGRWM) {
       return res.status(404).send("Item not found");
     }
-
     return res.status(200).send("Successfully deleted");
   } catch (error) {
     return res.status(500).send("Error deleting GRWM item: " + error.message);
   }
 });
+
 
 app.get("/:id", async (req, res) => {
   try {
@@ -98,16 +116,15 @@ app.get("/:id", async (req, res) => {
     }
 
     const grwmItem = await Grwm.findById(req.params.id);
-
     if (!grwmItem) {
       return res.status(404).send("Item not found");
     }
-
     return res.status(200).json(grwmItem);
   } catch (error) {
     return res.status(500).send("Error retrieving GRWM item: " + error.message);
   }
 });
+
 
 app.get("/brand/:name?", async (req, res) => {
   try {
@@ -120,9 +137,7 @@ app.get("/brand/:name?", async (req, res) => {
 
     return res.status(200).json(grwmItem);
   } catch (error) {
-    return res
-      .status(500)
-      .send("Error retrieving item by brand: " + error.message);
+    return res.status(500).send("Error retrieving item by brand: " + error.message);
   }
 });
 
@@ -143,27 +158,12 @@ app.get("/items/filters", async (req, res) => {
     const grwmItems = await Grwm.find(filters);
 
     if (grwmItems.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No items found with the provided filters" });
+      return res.status(404).json({ message: "No items found with the provided filters" });
     }
 
     return res.status(200).json(grwmItems);
   } catch (error) {
-    return res
-      .status(500)
-      .send("Error retrieving items by filters: " + error.message);
-  }
-});
-
-app.get("/", async (req, res) => {
-  try {
-    const grwmItems = await Grwm.find();
-    return res.status(200).json(grwmItems);
-  } catch (error) {
-    return res
-      .status(500)
-      .send("Error retrieving GRWM items: " + error.message);
+    return res.status(500).send("Error retrieving items by filters: " + error.message);
   }
 });
 
@@ -175,3 +175,4 @@ mongoose
     });
   })
   .catch((error) => console.error("Failed to connect to MongoDB", error));
+
