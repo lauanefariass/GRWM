@@ -175,4 +175,3 @@ mongoose
     });
   })
   .catch((error) => console.error("Failed to connect to MongoDB", error));
-
