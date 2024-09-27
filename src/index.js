@@ -17,6 +17,9 @@ const Grwm = mongoose.model("GRWM", {
 
 app.use(express.json());
 
+// Adiciona validação do ObjectId
+const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
+
 app.post("/", async (req, res) => {
   try {
     if (Array.isArray(req.body)) {
@@ -44,6 +47,10 @@ app.post("/", async (req, res) => {
 
 app.put("/:id", async (req, res) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).send("Invalid ID format");
+    }
+
     const updatedGRWM = await Grwm.findByIdAndUpdate(
       req.params.id,
       {
@@ -55,6 +62,11 @@ app.put("/:id", async (req, res) => {
       },
       { new: true }
     );
+
+    if (!updatedGRWM) {
+      return res.status(404).send("Item not found");
+    }
+
     return res.status(200).send("Successfully updated");
   } catch (error) {
     return res.status(500).send("Error updating GRWM item: " + error.message);
@@ -63,7 +75,16 @@ app.put("/:id", async (req, res) => {
 
 app.delete("/:id", async (req, res) => {
   try {
-    await Grwm.findByIdAndDelete(req.params.id);
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).send("Invalid ID format");
+    }
+
+    const deletedGRWM = await Grwm.findByIdAndDelete(req.params.id);
+
+    if (!deletedGRWM) {
+      return res.status(404).send("Item not found");
+    }
+
     return res.status(200).send("Successfully deleted");
   } catch (error) {
     return res.status(500).send("Error deleting GRWM item: " + error.message);
@@ -72,10 +93,16 @@ app.delete("/:id", async (req, res) => {
 
 app.get("/:id", async (req, res) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).send("Invalid ID format");
+    }
+
     const grwmItem = await Grwm.findById(req.params.id);
+
     if (!grwmItem) {
       return res.status(404).send("Item not found");
     }
+
     return res.status(200).json(grwmItem);
   } catch (error) {
     return res.status(500).send("Error retrieving GRWM item: " + error.message);
@@ -113,8 +140,6 @@ app.get("/items/filters", async (req, res) => {
       filters.description = { $regex: req.query.description, $options: "i" };
     }
 
-    console.log("Filters:", filters);
-
     const grwmItems = await Grwm.find(filters);
 
     if (grwmItems.length === 0) {
@@ -125,7 +150,6 @@ app.get("/items/filters", async (req, res) => {
 
     return res.status(200).json(grwmItems);
   } catch (error) {
-    console.error("Error details:", error);
     return res
       .status(500)
       .send("Error retrieving items by filters: " + error.message);
